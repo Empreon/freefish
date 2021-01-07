@@ -1,16 +1,22 @@
 import chess
+
 from PieceData import pieceDataBase
 
-board = chess.Board('8/8/1pk2p2/p2p2pp/P2Pp3/1PP1K1P1/5P1P/8 w - - 0 1')
-
-moveData = []
-moveValueData = []
-z = []
-
+board = chess.Board("6k1/8/6K1/8/8/8/8/2R5 w - - 0 1")
 
 # https:// www.geeksforgeeks.org / python - program - to - find - smallest - number - in -a - list /
 def evaluation():
     # https://andreasstckl.medium.com/writing-a-chess-program-in-one-day-30daff4610ec
+    if board.is_checkmate():
+        if board.turn:
+            return -9999
+        else:
+            return 9999
+    if board.is_stalemate():
+        return 0
+    if board.is_insufficient_material():
+        return 0
+
     wp = len(board.pieces(chess.PAWN, chess.WHITE))
     bp = len(board.pieces(chess.PAWN, chess.BLACK))
     wn = len(board.pieces(chess.KNIGHT, chess.WHITE))
@@ -33,36 +39,65 @@ def evaluation():
     else:
         return -material
 
-
 # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
 def keywithmaxval(d):
     v = list(d.values())
     k = list(d.keys())
     return k[v.index(max(v))]
 
+def keywithminval(d):
+    v = list(d.values())
+    k = list(d.keys())
+    return k[v.index(min(v))]
+
+def minimaxMoveData(x):
+    moveData = []
+    for firstMove in x.legal_moves:
+        moveData.append(firstMove)
+
+    return moveData
 
 def minimaxDeneme():
-    for firstMove in board.legal_moves:
-        board.push(firstMove)
-        moveData.append(firstMove)
-        for secondMove in board.legal_moves:
-            board.push(secondMove)
-            if board.is_game_over():
-                z.append(-9999)
-                board.pop()
-            else:
-                z.append(evaluation())
-                board.pop()
+    y = len(minimaxMoveData(board))
+    a = []
+    b = minimaxMoveData(board)
+    c = []
+    for i in range(y):
+        print(i)
+        x = 0
+        z = minimaxMoveData(board)
+        board.push(z[i])
         if board.is_game_over():
-            moveValueData.append(9999)
+            c.append(evaluation())
+            x = x + 1
+        for move in board.legal_moves:
+            board.push(move)
+            if board.is_game_over() and x == 0:
+                c.append(evaluation())
+                x = x + 1
+            for move2 in board.legal_moves:
+                board.push(move2)
+                if board.is_game_over() and x == 0:
+                    c.append(evaluation())
+                    x = x + 1
+                for move3 in board.legal_moves:
+                    board.push(move3)
+                    if board.is_game_over() and x == 0:
+                        c.append(evaluation())
+                        x = x + 1
+                    for move4 in board.legal_moves:
+                        board.push(move4)
+                        if x == 0:
+                            c.append(evaluation())
+                        board.pop()
+                    board.pop()
+                board.pop()
             board.pop()
-        else:
-            board.pop()
-            moveValueData.append(min(z))
+        board.pop()
+        a.append(min(c))
+        c.clear()
 
-    moveDict = dict(zip(moveData, moveValueData))
-    bestMove = keywithmaxval(moveDict)
-    print(moveDict)
-    print(bestMove)
+    baDict = dict(zip(b, a))
+    goodMove = keywithmaxval(baDict)
 
-    return bestMove
+    return goodMove
