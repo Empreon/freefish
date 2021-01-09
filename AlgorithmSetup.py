@@ -1,38 +1,16 @@
 import chess
-from PieceData import pieceDataBase
+import chess.polyglot
 
-board = chess.Board('8/8/1pk2p2/p2p2pp/P2Pp3/1PP1K1P1/5P1P/8 w - - 0 1')
+from BoardEvaluation_1 import evaluation
 
-moveData = []
-moveValueData = []
-z = []
+board = chess.Board("2k5/8/3K4/8/8/8/8/7R w - - 0 1")
 
+def minimaxMoveData(x):
+    moveData = []
+    for firstMove in x.legal_moves:
+        moveData.append(firstMove)
 
-# https:// www.geeksforgeeks.org / python - program - to - find - smallest - number - in -a - list /
-def evaluation():
-    # https://andreasstckl.medium.com/writing-a-chess-program-in-one-day-30daff4610ec
-    wp = len(board.pieces(chess.PAWN, chess.WHITE))
-    bp = len(board.pieces(chess.PAWN, chess.BLACK))
-    wn = len(board.pieces(chess.KNIGHT, chess.WHITE))
-    bn = len(board.pieces(chess.KNIGHT, chess.BLACK))
-    wb = len(board.pieces(chess.BISHOP, chess.WHITE))
-    bb = len(board.pieces(chess.BISHOP, chess.BLACK))
-    wr = len(board.pieces(chess.ROOK, chess.WHITE))
-    br = len(board.pieces(chess.ROOK, chess.BLACK))
-    wq = len(board.pieces(chess.QUEEN, chess.WHITE))
-    bq = len(board.pieces(chess.QUEEN, chess.BLACK))
-
-    material = pieceDataBase.pawnValue * (wp - bp) + \
-               pieceDataBase.kingValue * (wn - bn) + \
-               pieceDataBase.bishopValue * (wb - bb) + \
-               pieceDataBase.rookValue * (wr - br) + \
-               pieceDataBase.queenValue * (wq - bq)
-
-    if board.turn:
-        return material
-    else:
-        return -material
-
+    return moveData
 
 # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
 def keywithmaxval(d):
@@ -40,29 +18,61 @@ def keywithmaxval(d):
     k = list(d.keys())
     return k[v.index(max(v))]
 
+def keywithminval(d):
+    v = list(d.values())
+    k = list(d.keys())
+    return k[v.index(min(v))]
+
+def moveDeneme(move, list):
+    board.push(move)
+    if board.is_game_over():
+        list.append(evaluation(board))
 
 def minimaxDeneme():
-    for firstMove in board.legal_moves:
-        board.push(firstMove)
-        moveData.append(firstMove)
-        for secondMove in board.legal_moves:
-            board.push(secondMove)
-            if board.is_game_over():
-                z.append(-9999)
+    a = []
+    b = minimaxMoveData(board)
+    c = []
+    for move0 in board.legal_moves:
+        moveDeneme(move0, c)
+        if not board.is_game_over():
+            for move1 in board.legal_moves:
+                moveDeneme(move1, c)
+                if not board.is_game_over():
+                    for move2 in board.legal_moves:
+                        moveDeneme(move2, c)
+                        if not board.is_game_over():
+                            for move3 in board.legal_moves:
+                                moveDeneme(move3, c)
+                                if not board.is_game_over():
+                                    for move4 in board.legal_moves:
+                                        board.push(move4)
+                                        c.append(evaluation(board))
+                                        board.pop()
+                                board.pop()
+                        board.pop()
                 board.pop()
-            else:
-                z.append(evaluation())
-                board.pop()
-        if board.is_game_over():
-            moveValueData.append(9999)
-            board.pop()
-        else:
-            board.pop()
-            moveValueData.append(min(z))
+        board.pop()
 
-    moveDict = dict(zip(moveData, moveValueData))
-    bestMove = keywithmaxval(moveDict)
-    print(moveDict)
-    print(bestMove)
+        a.append(min(c))
+        c.clear()
 
-    return bestMove
+    baDict = dict(zip(b, a))
+
+    return baDict
+
+def bookMove():
+    book = []
+    move = chess.polyglot.MemoryMappedReader("kasparov.bin").weighted_choice(board).move
+    book.append(move)
+
+    return book
+
+
+def moveSelect():
+    try:
+        bookMoveList = bookMove()
+        return bookMoveList[0]
+    except:
+        print("move from algorithm")
+        maxMove = keywithmaxval(minimaxDeneme())
+        return maxMove
