@@ -13,7 +13,6 @@ def bookMove(board):
     book = []
     move = chess.polyglot.MemoryMappedReader("kasparov.bin").weighted_choice(board).move
     book.append(move)
-
     return book
 
 def moveDeneme(board, move, list):
@@ -32,16 +31,8 @@ def minimaxDeneme(board):
                 moveDeneme(board, move1, allValues)
                 if not board.is_game_over():
                     for move2 in board.legal_moves:
-                        moveDeneme(board, move2, allValues)
-                        if not board.is_game_over():
-                            for move3 in board.legal_moves:
-                                moveDeneme(board, move3, allValues)
-                                if not board.is_game_over():
-                                    for move4 in board.legal_moves:
-                                        board.push(move4)
-                                        allValues.append(evaluation(board))
-                                        board.pop()
-                                board.pop()
+                        board.push(move2)
+                        allValues.append(evaluation(board))
                         board.pop()
                 board.pop()
         board.pop()
@@ -60,4 +51,4 @@ def moveSelect(board):
         maxMove = keywithmaxval(minimaxDeneme(board))
         return maxMove
 
-chessboard = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+chessboard = chess.Board("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4")
