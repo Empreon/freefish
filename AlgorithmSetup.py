@@ -9,11 +9,6 @@ def keywithmaxval(d):
     k = list(d.keys())
     return k[v.index(max(v))]
 
-def keywithminval(d):
-    v = list(d.values())
-    k = list(d.keys())
-    return k[v.index(min(v))]
-
 def bookMove(board):
     book = []
     move = chess.polyglot.MemoryMappedReader("kasparov.bin").weighted_choice(board).move
