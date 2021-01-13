@@ -9,6 +9,11 @@ def keywithmaxval(d):
     k = list(d.keys())
     return k[v.index(max(v))]
 
+def keywithminval(d):
+    v = list(d.values())
+    k = list(d.keys())
+    return k[v.index(min(v))]
+
 def bookMove(board):
     book = []
     move = chess.polyglot.MemoryMappedReader("kasparov.bin").weighted_choice(board).move
@@ -25,10 +30,14 @@ def minimaxDeneme(board):
     moves = board.legal_moves
     allValues = []
     for move0 in board.legal_moves:
-        moveDeneme(board, move0, allValues)
+        board.push(move0)
+        if board.is_game_over():
+            allValues.append(evaluation(board))
         if not board.is_game_over():
             for move1 in board.legal_moves:
-                moveDeneme(board, move1, allValues)
+                board.push(move1)
+                if board.is_game_over():
+                    allValues.append(evaluation(board))
                 if not board.is_game_over():
                     for move2 in board.legal_moves:
                         board.push(move2)
@@ -36,7 +45,10 @@ def minimaxDeneme(board):
                         board.pop()
                 board.pop()
         board.pop()
-        minValues.append(min(allValues))
+        if board.turn:
+            minValues.append(min(allValues))
+        else:
+            minValues.append(max(allValues))
         allValues.clear()
 
     baDict = dict(zip(moves, minValues))
@@ -48,7 +60,11 @@ def moveSelect(board):
         return bookMoveList[0]
     except:
         print("move from algorithm")
-        maxMove = keywithmaxval(minimaxDeneme(board))
-        return maxMove
+        if board.turn:
+            goodmove = keywithmaxval(minimaxDeneme(board))
+        else:
+            goodmove = keywithminval(minimaxDeneme(board))
+        return goodmove
 
-chessboard = chess.Board("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4")
+# Enter fen code
+chessboard = chess.Board()
