@@ -14,57 +14,60 @@ def keywithminval(d):
     k = list(d.keys())
     return k[v.index(min(v))]
 
-def bookMove(board):
+def bookMoves(board):
     book = []
-    move = chess.polyglot.MemoryMappedReader("kasparov.bin").weighted_choice(board).move
-    book.append(move)
+    bookmove = chess.polyglot.MemoryMappedReader("kasparov.bin").weighted_choice(board).move
+    book.append(bookmove)
     return book
 
-def moveDeneme(board, move, list):
-    board.push(move)
-    if board.is_game_over():
-        list.append(evaluation(board))
+# https://www.youtube.com/watch?v=l-hh51ncgDI
+def minimaxDeneme(board, depth, alpha, beta, turn):
+    if depth == 0 or board.is_game_over():
+        return evaluation(board)
+    if turn:
+        maxValue = -9999
+        for whiteMove in board.legal_moves:
+            board.push(whiteMove)
+            value = minimaxDeneme(board, depth - 1, alpha, beta, False)
+            board.pop()
+            maxValue = max(maxValue, value)
+            alpha = max(alpha, value)
+            if beta <= alpha:
+                break
+        return maxValue
+    else:
+        minValue = 9999
+        for blackMove in board.legal_moves:
+            board.push(blackMove)
+            value = minimaxDeneme(board, depth - 1, alpha, beta, True)
+            board.pop()
+            minValue = min(minValue, value)
+            beta = min(beta, value)
+            if beta <= alpha:
+                break
+        return minValue
 
-def minimaxDeneme(board):
-    minValues = []
-    moves = board.legal_moves
-    allValues = []
-    for move0 in board.legal_moves:
-        board.push(move0)
-        if board.is_game_over():
-            allValues.append(evaluation(board))
-        if not board.is_game_over():
-            for move1 in board.legal_moves:
-                board.push(move1)
-                if board.is_game_over():
-                    allValues.append(evaluation(board))
-                if not board.is_game_over():
-                    for move2 in board.legal_moves:
-                        board.push(move2)
-                        allValues.append(evaluation(board))
-                        board.pop()
-                board.pop()
-        board.pop()
-        if board.turn:
-            minValues.append(min(allValues))
-        else:
-            minValues.append(max(allValues))
-        allValues.clear()
-
-    baDict = dict(zip(moves, minValues))
-    return baDict
-
-def moveSelect(board):
+# https://andreasstckl.medium.com/writing-a-chess-program-in-one-day-30daff4610ec
+def moveSelect(board, depth):
     try:
-        bookMoveList = bookMove(board)
+        bookMoveList = bookMoves(board)
+        print("move from book")
         return bookMoveList[0]
     except:
-        print("move from algorithm")
-        if board.turn:
-            goodmove = keywithmaxval(minimaxDeneme(board))
-        else:
-            goodmove = keywithminval(minimaxDeneme(board))
-        return goodmove
+        goodMove = chess.Move.null()
+        bestValue = -9999
+        alpha = -10000
+        beta = 10000
+        print("move from code")
+        for codemove in board.legal_moves:
+            board.push(codemove)
+            boardValue = minimaxDeneme(board, depth - 1, alpha, beta, board.turn)
+            if boardValue > bestValue:
+                bestValue = boardValue
+                goodMove = codemove
+            if boardValue > alpha:
+                alpha = boardValue
+            board.pop()
+        return goodMove
 
-# Enter fen code
-chessboard = chess.Board()
+chessboard = chess.Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
