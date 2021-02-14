@@ -28,7 +28,6 @@ def arrangeBoard(image_dir):
          }
     return d
 
-
 def reDesignBoard(board):
     b = str(board.fen).split()[4].replace('/', '')[7:]
 
@@ -123,7 +122,6 @@ class InputBox:
         if len(self.data) >= 1:
             self.data.remove(self.data[0])
             return
-
 
     def update(self):
         width = max(200, self.txt_surface.get_width()+10)
