@@ -48,7 +48,7 @@ def moveDataOrder(board):
 
 def bookMoves(board):
     book = []
-    bookmove = chess.polyglot.MemoryMappedReader("../Books/kasparov.bin").weighted_choice(board).move
+    bookmove = chess.polyglot.MemoryMappedReader("../kasparov.bin").weighted_choice(board).move
     book.append(bookmove)
     return book
 
