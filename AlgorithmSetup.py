@@ -46,6 +46,12 @@ def moveDataOrder(board):
 
     return moveOrder
 
+def bookMoves(board):
+    book = []
+    bookmove = chess.polyglot.MemoryMappedReader("../Books/kasparov.bin").weighted_choice(board).move
+    book.append(bookmove)
+    return book
+
 def moveSearch(depth, alpha, beta, board):
     bestScore = -9999
     if depth == 0:
@@ -82,18 +88,23 @@ def captureSearch(alpha, beta, board):
     return alpha
 
 def moveSelect(board, depth):
-    goodMove = chess.Move.null()
-    bestValue = -99999
-    alpha = -100000
-    beta = 100000
-    legalmoveList = moveDataOrder(board)
-    for move in legalmoveList:
-        board.push(move)
-        boardValue = -moveSearch(depth - 1, -alpha, -beta, board)
-        if boardValue > bestValue:
-            bestValue = boardValue
-            goodMove = move
-        if boardValue > alpha:
-            alpha = boardValue
-        board.pop()
-    return goodMove
+    try:
+        bookMoveList = bookMoves(board)
+        return bookMoveList[0]
+    except:
+        goodMove = chess.Move.null()
+        bestValue = -99999
+        alpha = -100000
+        beta = 100000
+        legalmoveList = moveDataOrder(board)
+        for move in legalmoveList:
+            board.push(move)
+            boardValue = -moveSearch(depth - 1, -alpha, -beta, board)
+            if boardValue > bestValue:
+                bestValue = boardValue
+                goodMove = move
+            if boardValue > alpha:
+                alpha = boardValue
+            board.pop()
+        return goodMove
+    
