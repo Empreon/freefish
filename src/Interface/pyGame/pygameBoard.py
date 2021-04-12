@@ -37,23 +37,23 @@ def reDesignBoard(board):
     for num in range(1, 10):
         b = b.replace(str(num), '.' * num)
 
-    image_dir = "C:\\Users\\hp\\Desktop\\Utku\\Python\\FreeFish\\src\\Interface\\chess-pieces\\"
+    image_dir = "image_path"
     image_dict = arrangeBoard(image_dir)
 
     d = []
     for x in zip(range(64), list(b)):
-        if x[1] != '.':
+        if x[1] != ".":
             image = image_dict[x[1]]
             d.append(image)
         else:
-            image = 'C:\\Users\\hp\\Desktop\\Utku\\Python\\FreeFish\\src\\Interface\\chess-pieces\\transparency.png'
+            image = "image_path"
             d.append(image)
     return d
 
 
 def showBoard(board):
     boardlist = reDesignBoard(board)
-    bg = pg.image.load("C:\\Users\\hp\\Desktop\\Utku\\Python\\FreeFish\\src\\Interface\\chess-pieces\\chessBoard.png")
+    bg = pg.image.load("image_path")
     screen.blit(bg, (50, 50))
     for i in range(64):
         if i <= 7:
