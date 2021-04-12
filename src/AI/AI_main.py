@@ -35,7 +35,7 @@ class AI(object):
     def f_bookmoves_custom(self):
         book = []
         bookmove = chess.polyglot.MemoryMappedReader(
-            "C:\\Users\\hp\\Desktop\\Utku\\Python\\FreeFish\\src\\AI\\OpeningBook\\kasparov.bin").weighted_choice(self.board).move
+            "book_path").weighted_choice(self.board).move
         book.append(bookmove)
         return book
 
