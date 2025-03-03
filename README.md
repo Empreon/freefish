@@ -19,7 +19,7 @@ A terminal-based chess AI implementing minimax algorithm with alpha-beta pruning
 - python-chess
 
 ## Installation
-git clone https://github.com/yourusername/Freefish.git
+git clone https://github.com/Empreon/Freefish.git
 cd chess-ai
 pip install -r requirements.txt
 
