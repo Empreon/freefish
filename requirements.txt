@@ -1,2 +1,2 @@
-numpy==2.0.2
+numpy>=1.24.3
 python-chess==1.11.2
