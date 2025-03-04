@@ -38,3 +38,10 @@ pip install -r requirements.txt
 **Opening Book**
 - Replace `kasparov.bin` with alternative opening books
 - Ensure binary opening books are in `/OpeningBooks` directory
+
+## Project History
+Originally developed in 2021 as a learning project for:
+- Game theory algorithms
+- Chess AI fundamentals
+- Python optimization techniques
+
